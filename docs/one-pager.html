@@ -1,0 +1,350 @@
+<title>Turnos médicos transparentes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: una hoja en grilla; hero con la ficha de precio como tesis, luego bloques de lectura rápida */
+:root {
+  --bg: #f4f7f6;
+  --surface: #ffffff;
+  --ink: #12302b;
+  --muted: #557069;
+  --line: #d6e2de;
+  --accent: #0d7a63;
+  --accent-soft: #dcefe9;
+  --price: #b86e00;
+  --price-soft: #fdf1dc;
+  --f-display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1816; --surface: #15221f; --ink: #e3eeeb; --muted: #93aca5;
+    --line: #2a3b37; --accent: #4cc7a6; --accent-soft: #173a32;
+    --price: #f2b45a; --price-soft: #3a2a12; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1816; --surface: #15221f; --ink: #e3eeeb; --muted: #93aca5;
+  --line: #2a3b37; --accent: #4cc7a6; --accent-soft: #173a32;
+  --price: #f2b45a; --price-soft: #3a2a12; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 15px; line-height: 1.55;
+}
+.page {
+  max-width: 1080px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 56px;
+  display: grid; gap: 40px;
+}
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.05; font-weight: 700; letter-spacing: -0.02em; }
+h2 { font-size: 1.35rem; font-weight: 700; }
+h3 { font-size: 1.02rem; font-weight: 700; }
+p { margin: 0; }
+.eyebrow {
+  font-family: var(--f-mono); font-size: 0.72rem; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--accent);
+}
+.muted { color: var(--muted); }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+
+/* Hero */
+.hero { display: grid; grid-template-columns: 1.25fr 1fr; gap: 40px; align-items: center; }
+.hero-text { display: grid; gap: 18px; min-width: 0; }
+.hero-text .lede { font-size: 1.12rem; max-width: 52ch; color: var(--muted); }
+.hero-text .lede strong { color: var(--ink); font-weight: 600; }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag {
+  font-size: 0.8rem; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--line); color: var(--muted);
+}
+
+/* Ficha de ejemplo */
+.ficha {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 22px; display: grid; gap: 16px;
+  box-shadow: 0 1px 0 var(--line), 0 18px 40px -24px rgba(18, 48, 43, 0.35);
+}
+.ficha-head { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+.ficha-head .sub { font-size: 0.85rem; color: var(--muted); }
+.verif {
+  font-size: 0.72rem; font-weight: 600; white-space: nowrap;
+  background: var(--accent-soft); color: var(--accent);
+  padding: 3px 8px; border-radius: 6px;
+}
+.precio { display: grid; gap: 4px; padding: 14px; border-radius: 10px; background: var(--price-soft); }
+.precio .row { display: flex; justify-content: space-between; gap: 12px; font-size: 0.9rem; }
+.precio .total { font-weight: 600; border-top: 1px dashed var(--price); padding-top: 6px; margin-top: 2px; }
+.precio .fresh { font-size: 0.78rem; color: var(--price); font-family: var(--f-mono); }
+.cob { display: grid; gap: 6px; font-size: 0.86rem; }
+.cob div { display: flex; justify-content: space-between; gap: 12px; }
+.slots { display: flex; flex-wrap: wrap; gap: 6px; }
+.slot {
+  font-family: var(--f-mono); font-size: 0.8rem; padding: 6px 10px; border-radius: 8px;
+  border: 1px solid var(--line);
+}
+.slot.on { background: var(--accent); color: var(--surface); border-color: var(--accent); }
+.ficha .nota { font-size: 0.72rem; color: var(--muted); }
+
+/* Secciones */
+section { display: grid; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.block { border-top: 2px solid var(--ink); padding-top: 12px; display: grid; gap: 8px; min-width: 0; }
+.block p { color: var(--muted); }
+.big { font-family: var(--f-display); font-size: 2rem; font-weight: 700; line-height: 1; color: var(--ink); }
+
+.panel {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 20px; display: grid; gap: 12px; min-width: 0;
+}
+.panel ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.panel li::marker { color: var(--accent); }
+
+/* Flujo */
+.flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; counter-reset: paso; }
+.step { position: relative; padding: 14px 14px 0 0; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.step::before {
+  counter-increment: paso; content: counter(paso);
+  font-family: var(--f-mono); font-size: 0.75rem; font-weight: 500;
+  width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--accent); color: var(--surface); position: relative; z-index: 1;
+}
+.step::after {
+  content: ""; position: absolute; top: 27px; left: 26px; right: 0; height: 2px; background: var(--line);
+}
+.step:last-child::after { display: none; }
+.step b { font-size: 0.92rem; }
+.step span { font-size: 0.84rem; color: var(--muted); }
+
+/* Fases */
+.fases { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.fase { border-radius: 12px; padding: 16px; border: 1px solid var(--line); display: grid; gap: 8px; align-content: start; min-width: 0; }
+.fase.now { background: var(--accent-soft); border-color: var(--accent); }
+.fase .when { font-family: var(--f-mono); font-size: 0.72rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; }
+.fase ul { margin: 0; padding-left: 16px; font-size: 0.86rem; color: var(--muted); display: grid; gap: 3px; }
+
+/* Métricas */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 520px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--f-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 500; }
+tr:last-child td { border-bottom: none; }
+td.obj { font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--accent); }
+
+.stack { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-size: 0.84rem; padding: 6px 10px; border-radius: 8px; background: var(--surface); border: 1px solid var(--line); }
+.chip b { font-weight: 600; }
+
+footer { font-size: 0.8rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .fases { grid-template-columns: repeat(2, 1fr); }
+  .flow { grid-template-columns: 1fr; gap: 8px; }
+  .step { grid-template-columns: 26px 1fr; column-gap: 12px; padding: 0; }
+  .step::before { grid-row: span 2; }
+  .step::after { display: none; }
+}
+@media (max-width: 560px) {
+  .grid-2, .fases { grid-template-columns: 1fr; }
+}
+</style>
+
+<main class="page">
+
+  <header class="hero">
+    <div class="hero-text">
+      <span class="eyebrow">One pager · Argentina · v0.1 · nov 2026</span>
+      <h1>Turnos médicos particulares con el precio a la vista</h1>
+      <p class="lede">Una <strong>agenda excelente para el profesional</strong> que cobra por adelantado y reduce ausencias. Arriba de esa agenda, <strong>un mapa público</strong> donde el paciente encuentra especialistas, ve el precio vigente con su fecha y reserva y paga en un solo paso.</p>
+      <div class="tags">
+        <span class="tag">Piloto en CABA y San Isidro</span>
+        <span class="tag">4 profesionales</span>
+        <span class="tag">Equipo de 2</span>
+      </div>
+    </div>
+
+    <aside class="ficha" aria-label="Perfil de ejemplo">
+      <div class="ficha-head">
+        <div>
+          <h3>Cardiología · Consulta</h3>
+          <div class="sub">Palermo y San Isidro · 30 min</div>
+        </div>
+        <span class="verif">Matrícula verificada</span>
+      </div>
+      <div class="precio">
+        <div class="row"><span>Honorario del profesional</span><span class="mono">$ 48.000</span></div>
+        <div class="row"><span>Cargo de servicio</span><span class="mono">$ 2.400</span></div>
+        <div class="row total"><span>Total a pagar</span><span class="mono">$ 50.400</span></div>
+        <span class="fresh">Precio actualizado hace 3 días</span>
+      </div>
+      <div class="cob">
+        <div><span>Prepaga A · plan 310</span><span class="muted">Convenio, plus $ 15.000</span></div>
+        <div><span>Prepaga B · todos los planes</span><span class="muted">Factura para reintegro</span></div>
+      </div>
+      <div class="slots">
+        <span class="slot">Mar 9:00</span><span class="slot on">Mar 9:30</span><span class="slot">Jue 16:00</span><span class="slot">Jue 16:30</span>
+      </div>
+      <span class="nota">Perfil y montos de ejemplo, para ilustrar.</span>
+    </aside>
+  </header>
+
+  <section>
+    <span class="eyebrow">El problema</span>
+    <div class="grid-3">
+      <div class="block">
+        <span class="big">60–90 días</span>
+        <h3>El médico cobra tarde</h3>
+        <p>Las prepagas pagan poco y tarde. Por eso cada vez más profesionales atienden de forma particular.</p>
+      </div>
+      <div class="block">
+        <span class="big">¿Cuánto sale?</span>
+        <h3>El paciente compara a ciegas</h3>
+        <p>No sabe el precio de la consulta ni cuánto le reintegra su plan hasta que pregunta, uno por uno.</p>
+      </div>
+      <div class="block">
+        <span class="big">20–30%</span>
+        <h3>Turnos que nadie usa</h3>
+        <p>Los turnos se piden por WhatsApp a una secretaria, sin seña ni recordatorios, y una buena parte termina en ausencia.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">La propuesta</span>
+    <div class="grid-2">
+      <div class="panel">
+        <h2>Para el profesional y su secretario/a</h2>
+        <ul>
+          <li>Una agenda rápida que funciona como fuente de verdad: también se cargan los turnos que entran por WhatsApp o teléfono.</li>
+          <li>Cobro inmediato con Mercado Pago, directo a su cuenta.</li>
+          <li>Recordatorios por WhatsApp a las 48 h y 24 h, con confirmación.</li>
+          <li>Políticas de cancelación estándar que se aplican solas.</li>
+          <li>Varios consultorios, cada uno con sus horarios y la precisión de ubicación que elija.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h2>Para el paciente</h2>
+        <ul>
+          <li>Búsqueda en el mapa por especialidad, zona, precio y cobertura.</li>
+          <li>Precio vigente con fecha de actualización y cargo de servicio desglosado.</li>
+          <li>Qué prepagas acepta, con qué plus, o si da factura para reintegro.</li>
+          <li>Reserva y pago en menos de 2 minutos.</li>
+          <li>Reintegro automático si cancela el profesional.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Cómo funciona una reserva</span>
+    <div class="flow">
+      <div class="step"><b>Elige horario</b><span>El horario queda reservado 15 minutos mientras paga.</span></div>
+      <div class="step"><b>Paga</b><span>Mercado Pago le paga al profesional y separa nuestra comisión.</span></div>
+      <div class="step"><b>Turno confirmado</b><span>Profesional y secretaria lo ven al instante en la agenda.</span></div>
+      <div class="step"><b>Recordatorios</b><span>WhatsApp a las 48 h y 24 h para confirmar, cancelar o cambiar.</span></div>
+      <div class="step"><b>Atención</b><span>Se marca atendido o ausente. Cada día se cruzan los pagos con los turnos.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Hoja de ruta</span>
+    <div class="fases">
+      <div class="fase now">
+        <span class="when">Fase 0 · ahora</span>
+        <h3>Agenda</h3>
+        <ul><li>Matrícula verificada</li><li>Consultorios y horarios</li><li>Agenda para secretaria</li><li>Recordatorios</li></ul>
+      </div>
+      <div class="fase">
+        <span class="when">Fase 1</span>
+        <h3>Marketplace</h3>
+        <ul><li>Mapa y búsqueda</li><li>Reserva con pago</li><li>Coberturas declaradas</li><li>Aviso para revisar precios</li></ul>
+      </div>
+      <div class="fase">
+        <span class="when">Fase 2</span>
+        <h3>Cobertura y confianza</h3>
+        <ul><li>Reseñas de turnos reales</li><li>Turnos por prepaga</li><li>Seguimiento de reintegros</li></ul>
+      </div>
+      <div class="fase">
+        <span class="when">Fase 3</span>
+        <h3>Plataforma clínica</h3>
+        <ul><li>Receta electrónica (RCTA, luego propia)</li><li>Historia clínica</li><li>Estudios</li><li>Clínicas y hospitales</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid-2">
+    <div class="panel">
+      <span class="eyebrow">Modelo de negocio</span>
+      <h2>Suscripción + comisión visible</h2>
+      <ul>
+        <li><b>Suscripción mensual</b> del profesional por la agenda, los recordatorios y los cobros.</li>
+        <li><b>Comisión</b> sobre las reservas particulares pagadas online, siempre desglosada para el paciente.</li>
+        <li>Nunca tenemos la plata en nuestras manos: el pago va directo a la cuenta del profesional.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <span class="eyebrow">Principios técnicos</span>
+      <h2>Simple de operar, difícil de romper</h2>
+      <ul>
+        <li>Un solo sistema, organizado en módulos claros, con un solo deploy.</li>
+        <li>La base de datos impide por sí misma que se reserve dos veces el mismo horario.</li>
+        <li>Pensado desde el día 1 para varias organizaciones, de consultorio a hospital.</li>
+        <li>Sin datos clínicos hasta la fase 3.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Qué tiene que pasar en 3 meses</span>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Dimensión</th><th>Métrica</th><th>Objetivo</th></tr></thead>
+        <tbody>
+          <tr><td>Adopción</td><td>Profesionales que cargan al menos el 80% de sus turnos en la agenda</td><td class="obj">4 → 20</td></tr>
+          <tr><td>Volumen</td><td>Turnos gestionados por mes</td><td class="obj">200</td></tr>
+          <tr><td>Ausentismo</td><td>Turnos no asistidos</td><td class="obj">&lt; 10%</td></tr>
+          <tr><td>Transparencia</td><td>Perfiles con precio confirmado en los últimos 30 días</td><td class="obj">&gt; 90%</td></tr>
+          <tr><td>Experiencia</td><td>Tiempo para que una secretaria cargue un turno</td><td class="obj">&lt; 15 s</td></tr>
+          <tr><td>Resiliencia</td><td>Turnos duplicados</td><td class="obj">0</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="grid-2">
+    <div class="panel">
+      <span class="eyebrow">Stack</span>
+      <div class="stack">
+        <span class="chip"><b>Next.js</b> en Vercel</span>
+        <span class="chip"><b>Postgres + PostGIS</b> en São Paulo</span>
+        <span class="chip"><b>Drizzle</b></span>
+        <span class="chip"><b>Mercado Pago</b> marketplace</span>
+        <span class="chip"><b>WhatsApp</b> Cloud API</span>
+        <span class="chip"><b>Inngest</b> para tareas programadas</span>
+        <span class="chip"><b>MapLibre</b> + Georef</span>
+      </div>
+    </div>
+    <div class="panel">
+      <span class="eyebrow">A validar antes de la fase 1</span>
+      <ul>
+        <li>Reglas de los colegios profesionales sobre aranceles mínimos y publicidad de tarifas.</li>
+        <li>Datos de salud alojados fuera del país: contratos con los proveedores.</li>
+        <li>Si el paciente acepta pagar por adelantado (medirlo desde el día 1).</li>
+        <li>Cómo se ofrecen los turnos por prepaga sin pago adelantado.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>Borrador de trabajo. El detalle está en docs/: producto, arquitectura, modelo de datos y legal y riesgos.</footer>
+</main>
