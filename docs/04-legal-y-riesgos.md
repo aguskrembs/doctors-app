@@ -46,8 +46,15 @@
 
 ### 5. Desintermediación
 - **Riesgo:** el paciente conoce al profesional y el siguiente turno lo pide por WhatsApp.
-- **Mitigación:** cobrar por la agenda (SaaS), no solo por el marketplace. Si la secretaria carga el turno por WhatsApp en nuestra agenda, igual seguimos siendo valiosos.
+- **Mitigación:** cobrar por la agenda (SaaS), no solo por el marketplace. Si la secretaria carga en nuestra agenda el turno que le pidieron por fuera, igual seguimos siendo valiosos.
 
-### 6. Hospitales
+### 6. Pacientes que responden el WhatsApp
+- **Riesgo:** el paciente espera conversar ("¿puedo ir 10 minutos más tarde?") y nadie le contesta, o cree que canceló respondiendo "no voy".
+- **Mitigación:**
+  - El texto de la plantilla lo dice claro: "Confirmá, cancelá o cambiá tu turno acá" con el botón de link.
+  - Cualquier respuesta recibe un mensaje automático fijo: "Este número solo envía avisos. Gestioná tu turno acá: link · Consultorio: teléfono". No se interpreta nada.
+  - Sub-estado "sin respuesta" en la agenda: la secretaria llama solo a esos pacientes del día siguiente.
+
+### 7. Hospitales
 - **Riesgo:** ciclos de venta largos, licitaciones, integraciones con HIS legacy.
 - **Mitigación:** no tocar el roadmap por esto hasta tener 100+ profesionales. El modelo `organizacion.tipo` ya lo contempla.

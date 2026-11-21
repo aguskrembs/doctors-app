@@ -16,7 +16,7 @@ En Argentina cada vez más médicos atienden de forma particular: las prepagas p
 | Rol | Necesidad principal |
 |---|---|
 | Profesional | Llenar la agenda, cobrar rápido, no perder tiempo administrando |
-| Secretario/a | Usar la agenda como fuente de verdad única: cargar turnos de WhatsApp o teléfono, reprogramar, ver el día |
+| Secretario/a | Usar la agenda como fuente de verdad única: cargar los turnos que le piden por teléfono o mensaje, reprogramar, ver el día |
 | Paciente | Encontrar, comparar precio y cobertura, reservar, recibir recordatorios |
 | Admin (nosotros) | Verificar matrículas, moderar reseñas, soporte |
 
@@ -51,7 +51,7 @@ En Argentina cada vez más médicos atienden de forma particular: las prepagas p
 - Disponibilidad semanal por consultorio, más excepciones (vacaciones, feriados).
 - Agenda día/semana para profesional y secretario: alta rápida, reprogramación, estados del turno.
 - Pacientes del profesional: alta rápida con nombre y teléfono.
-- Recordatorios por WhatsApp a las 48 h y 24 h, con confirmación o cancelación.
+- Recordatorios por WhatsApp a las 48 h y 24 h (email como alternativa, con `.ics`). El mensaje solo avisa y trae un link a una página donde el paciente confirma, cancela o reprograma con un toque.
 - Recordatorio al profesional para revisar sus precios (semanal o mensual, configurable).
 
 ### Fase 1: marketplace particular
@@ -88,6 +88,7 @@ Además hay reglas transversales: hasta 1 reprogramación gratis dentro de la ve
 
 ## Fuera de alcance (por ahora)
 
+- **Interactuar con la app vía WhatsApp** (botones de respuesta, chatbot, interpretar texto). WhatsApp es el canal principal de aviso, pero cada acción ocurre en nuestra UI: saltar entre apps e interpretar lo que escribe el usuario empeora la experiencia.
 - Telemedicina.
 - Facturación electrónica ARCA desde la app. A futuro conviene integrarla, porque el reintegro depende de la factura.
 - App nativa: arrancamos con web responsive y PWA.

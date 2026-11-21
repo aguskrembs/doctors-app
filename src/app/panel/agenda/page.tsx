@@ -1,13 +1,16 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
+import { getSesion } from "@/sesion";
 
 export const dynamic = "force-dynamic";
 const TZ = "America/Argentina/Buenos_Aires";
 
 async function crearTurno(form: FormData) {
   "use server";
-  const prof = Number(form.get("prof"));
+  // El profesional sale de la sesión, nunca del formulario.
+  const sesion = await getSesion();
+  if (sesion.rol !== "profesional") redirect("/");
+  const prof = sesion.profesionalId;
   const prestacion = Number(form.get("prestacion"));
   const paciente = Number(form.get("paciente"));
   const hora = String(form.get("hora"));
@@ -24,23 +27,34 @@ async function crearTurno(form: FormData) {
     );
   } catch (e) {
     // 23P01 = exclusion_violation: la base impidió la superposición.
-    if ((e as { code?: string }).code === "23P01") redirect(`/agenda?p=${prof}&error=ocupado&hora=${hora}`);
+    if ((e as { code?: string }).code === "23P01") redirect(`/panel/agenda?error=ocupado&hora=${encodeURIComponent(hora)}`);
     throw e;
   }
-  redirect(`/agenda?p=${prof}&ok=1`);
+  redirect("/panel/agenda?ok=1");
 }
+
+// Texto y clase visual por estado (ver docs/05 → Lenguaje visual de estados).
+const ESTADO: Record<string, { texto: string; clase: string }> = {
+  PENDIENTE_PAGO: { texto: "Esperando pago", clase: "pendiente" },
+  CONFIRMADO: { texto: "Reservado", clase: "reservado" },
+  ATENDIDO: { texto: "Atendido", clase: "atendido" },
+  AUSENTE: { texto: "Ausente", clase: "ausente" },
+  CANCELADO: { texto: "Cancelado", clase: "cancelado" },
+  EXPIRADO: { texto: "No se pagó", clase: "cancelado" },
+};
 
 type Turno = { id: number; desde: string; hasta: string; paciente: string; prestacion: string; estado: string; origen: string };
 
 export default async function Agenda({
   searchParams,
-}: { searchParams: Promise<{ p?: string; error?: string; ok?: string; hora?: string }> }) {
+}: { searchParams: Promise<{ error?: string; ok?: string; hora?: string }> }) {
   const sp = await searchParams;
+  const sesion = await getSesion();
+  if (sesion.rol !== "profesional") redirect("/"); // también lo cubre panel/layout
   const db = await getDb();
-  const profs = (await db.query<{ id: number; nombre: string; especialidad: string }>(
-    "SELECT id, nombre, especialidad FROM profesional ORDER BY id")).rows;
-  const profId = Number(sp.p ?? profs[0].id);
-  const prof = profs.find((p) => p.id === profId) ?? profs[0];
+  const prof = (await db.query<{ id: number; nombre: string; especialidad: string }>(
+    "SELECT id, nombre, especialidad FROM profesional WHERE id = $1", [sesion.profesionalId])).rows[0];
+  if (!prof) redirect("/");
 
   const [turnos, prests, pacs] = await Promise.all([
     db.query<Turno>(
@@ -62,12 +76,7 @@ export default async function Agenda({
     <>
       <section className="hero">
         <h1>Agenda de hoy</h1>
-        <p className="muted" style={{ textTransform: "capitalize" }}>{hoy}</p>
-        <div className="chips">
-          {profs.map((p) => (
-            <Link key={p.id} href={`/agenda?p=${p.id}`} className={p.id === prof.id ? "chip on" : "chip"}>{p.nombre}</Link>
-          ))}
-        </div>
+        <p className="muted">{hoy.charAt(0).toUpperCase() + hoy.slice(1)}</p>
       </section>
 
       <div className="agenda">
@@ -75,24 +84,26 @@ export default async function Agenda({
           <h2>{prof.nombre} <span className="muted">· {prof.especialidad}</span></h2>
           {turnos.rows.length === 0 && <p className="muted">No hay turnos cargados para hoy.</p>}
           <ol className="turnos">
-            {turnos.rows.map((t) => (
-              <li key={t.id} className={`turno ${t.estado.toLowerCase()}`}>
+            {turnos.rows.map((t) => {
+              const e = ESTADO[t.estado] ?? { texto: t.estado, clase: "" };
+              return (
+              <li key={t.id} className={`turno ${e.clase}`}>
                 <span className="mono hora">{t.desde}–{t.hasta}</span>
                 <div>
                   <strong>{t.paciente}</strong>
                   <div className="muted small">{t.prestacion}</div>
                 </div>
-                <span className="badge">{t.estado === "PENDIENTE_PAGO" ? "Esperando pago" : t.estado === "CONFIRMADO" ? "Confirmado" : t.estado}</span>
+                <span className={`estado ${e.clase}`}>{e.texto}</span>
                 <span className="muted small">{t.origen === "ONLINE" ? "Online" : "Panel"}</span>
               </li>
-            ))}
+              );
+            })}
           </ol>
         </section>
 
         <section className="panel">
           <h2>Cargar turno</h2>
           <form action={crearTurno} className="form">
-            <input type="hidden" name="prof" value={prof.id} />
             <label>Paciente
               <select name="paciente" required>{pacs.rows.map((x) => <option key={x.id} value={x.id}>{x.nombre}</option>)}</select>
             </label>

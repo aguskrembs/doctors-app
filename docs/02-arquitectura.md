@@ -19,7 +19,7 @@ src/
   app/                    # rutas Next.js (UI + route handlers)
     (publico)/            # mapa, perfil, reserva
     (panel)/              # agenda del profesional / secretario
-    api/webhooks/         # mercadopago, whatsapp
+    api/webhooks/         # mercadopago, whatsapp (solo estados de entrega y lectura)
   modules/
     identidad/            # usuarios, organizaciones, membresías, roles
     profesionales/        # perfil, matrícula, verificación, especialidades
@@ -27,7 +27,7 @@ src/
     catalogo/             # prestaciones, precios con vigencia, coberturas aceptadas
     agenda/               # disponibilidad, excepciones, cálculo de slots, turnos
     pagos/                # Mercado Pago, comisiones, reintegros, conciliación
-    notificaciones/       # WhatsApp, email, recordatorios programados
+    notificaciones/       # WhatsApp, email, web push, recordatorios programados
     busqueda/             # consultas geoespaciales y filtros
   lib/                    # db, auth, logger, errores, tiempo (TZ AR)
 ```
@@ -45,7 +45,9 @@ Si un módulo necesita escalar por separado (por ejemplo, búsqueda o notificaci
 | Auth | Better Auth (en nuestra DB) | Los datos de identidad quedan con nosotros; soporta organizaciones y roles |
 | Jobs / programados | **Inngest** (o Trigger.dev) | Recordatorios, expiración de reservas pendientes, conciliación; reintentos e idempotencia sin colas propias |
 | Pagos | **Mercado Pago Checkout Pro**, modo marketplace (OAuth del profesional + `marketplace_fee`) | La plata va directo a la cuenta del profesional; nosotros cobramos la comisión. **No custodiamos fondos** |
-| WhatsApp | Meta WhatsApp Cloud API (plantillas aprobadas) | Canal que el paciente ya usa |
+| WhatsApp | Meta WhatsApp Cloud API: plantillas de utilidad con **un botón de link** | Canal principal de avisos al paciente, porque es el que lee. Solo salida: no procesamos respuestas |
+| Email | **Resend** + React Email | Alternativa cuando no hay WhatsApp o falla la entrega; lleva el `.ics` |
+| Push | Web Push (PWA, claves VAPID) | Avisos al profesional y la secretaria (turno nuevo, cancelación, revisar precios) sin otra app |
 | Mapas | MapLibre GL + tiles de MapTiler | Más barato y sin lock-in de Google |
 | Geocoding | **Georef API** (datos.gob.ar) + USIG para CABA | Normalización oficial de direcciones argentinas |
 | Archivos | Vercel Blob o S3 | Fotos de matrícula, cifradas y con acceso firmado |
@@ -84,8 +86,8 @@ Mismo modelo, pero con `origen=PANEL` y sin pago (o con un "pago registrado manu
 
 Al confirmar un turno se programan eventos en Inngest para T-48 h y T-24 h. Cada recordatorio:
 1. Revisa el estado actual del turno antes de enviar.
-2. Manda la plantilla de WhatsApp con botones Confirmar, Cancelar y Reprogramar.
-3. Recibe la respuesta por webhook y aplica la política de cancelación.
+2. Manda la plantilla de WhatsApp (o email si no hay WhatsApp) con el resumen del turno y un único botón de link a `/t/[token]`.
+3. En esa página el paciente confirma, cancela o reprograma. La acción y la política de cancelación se aplican en el servidor, sin interpretar texto libre.
 
 ### 4. Frescura de precios
 
@@ -109,3 +111,4 @@ Un job semanal busca precios con `vigente_desde` de más de N días y le manda a
 | 005 | Organización como unidad de tenencia | Profesional como tenant | Escala a consultorios compartidos, clínicas y hospitales |
 | 006 | Receta electrónica integrada (RCTA) antes que propia | Construirla en el MVP | La plataforma propia requiere registro en ReNaPDiS; queda en fase 3 |
 | 007 | Jobs en Inngest | SQS + Lambda | Menos configuración; si crecemos, migrar a AWS es viable |
+| 008 | WhatsApp solo para avisar; toda acción en nuestra UI | Botones de respuesta o chatbot en WhatsApp | WhatsApp asegura que el aviso se lea; la acción (confirmar, cancelar, reprogramar) es más simple y confiable en una UI que interpretando respuestas. Si el paciente responde, recibe un mensaje automático fijo con el link |
