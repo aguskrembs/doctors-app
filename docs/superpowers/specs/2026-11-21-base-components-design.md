@@ -11,8 +11,8 @@ Hoy todo el estilo es un `globals.css` de 385 líneas con clases globales y cada
 1. Librería en `src/components/ui/` con: botón, input, select, campo (label + ayuda + error), popover, drawer, diálogo, toast y badge de estado del turno. Más lo que ya está en uso: chip, card, alerta, recibo y estado vacío.
 2. Las pantallas actuales usan esos componentes en lugar de clases sueltas.
 3. Claro y oscuro con los tokens de `globals.css`. Los componentes no llevan colores propios ni `dark:` repartido.
-4. Una página de muestra en **`/sistema`** que muestra cada componente, en todos sus estados, con un switch claro/oscuro y en cualquier ancho.
-5. Lineamientos escritos en `docs/06-sistema-de-diseno.md`, enlazados desde `CLAUDE.md`.
+4. Una página de muestra en **`/system`** que muestra cada componente, en todos sus estados, con un switch claro/oscuro y en cualquier ancho.
+5. Lineamientos escritos en `docs/06-design-system.md`, enlazados desde `CLAUDE.md`.
 
 ## No objetivos
 
@@ -24,7 +24,7 @@ Hoy todo el estilo es un `globals.css` de 385 líneas con clases globales y cada
 ## Anti-objetivos
 
 - Que se vea como shadcn "de fábrica". Todo se tematiza con los tokens porteños.
-- Que `/sistema` sea accesible para pacientes o aparezca en la navegación.
+- Que `/system` sea accesible para pacientes o aparezca en la navegación.
 - Duplicar tokens en dos lugares.
 
 ## Enfoque elegido: Tailwind v4 + shadcn/ui (opción C)
@@ -34,13 +34,13 @@ Se evaluó (A) todo nativo con CSS a mano, (B) nativo + Radix para popover y toa
 Decisiones de cómo, ya tomadas:
 
 - **Tokens:** siguen en `globals.css` como variables CSS (`--bg`, `--accent`, `--st-*`…), una sola fuente. Se mapean a Tailwind con `@theme inline` (`bg-surface`, `text-ink`, `border-line`, `text-accent`…). Los nombres de shadcn (`background`, `primary`, `destructive`…) se alias a los nuestros.
-- **Oscuro:** los tokens ya cambian con `prefers-color-scheme`. Se suma `[data-theme="dark"|"light"]` en `<html>` para forzarlo (lo usa `/sistema`). Como los tokens cambian de valor, los componentes casi nunca necesitan `dark:`.
+- **Oscuro:** los tokens ya cambian con `prefers-color-scheme`. Se suma `[data-theme="dark"|"light"]` en `<html>` para forzarlo (lo usa `/system`). Como los tokens cambian de valor, los componentes casi nunca necesitan `dark:`.
 - **Convivencia con el CSS actual:** el CSS sin capa le gana siempre a las utilidades de Tailwind. Por eso el CSS existente pasa a `@layer legacy`, declarada entre `base` y `components`: `@layer theme, base, legacy, components, utilities`. Así los componentes nuevos ganan donde se usan, y lo viejo sigue igual donde no se migró. Cada clase migrada se borra de `legacy`.
 - **Preflight de Tailwind:** se importa, y se revisan las pantallas actuales (títulos, `nav`, `label`, `select`) para que no cambien de aspecto.
 - **Primitivas:** Radix (`popover`, `dialog` para diálogo y drawer) y `sonner` para el toast, tematizado. `class-variance-authority`, `clsx` y `tailwind-merge` para las variantes. El `<select>` es el nativo, estilado: en celular abre el selector del sistema y con teclado es lo más rápido.
 - **Drawer:** un solo componente, lateral en desktop y hoja inferior en celular (≤ 720 px, el mismo corte que ya usa el repo). El diálogo (modal centrado en desktop, hoja inferior en celular) reemplaza al `<dialog>` del modal de filtros.
 - **Táctil:** controles de 44 px de alto en celular; en desktop del panel pueden ser más densos.
-- **Estado del turno:** un único mapa `estado → texto, color, ícono` en `EstadoTurno`; la agenda deja de tener el suyo. Cumple docs/05: color + ícono + texto.
+- **Estado del turno:** un único mapa `estado → texto, color, ícono` en `AppointmentStatus`; la agenda deja de tener el suyo. Cumple docs/05: color + ícono + texto.
 - **Movimiento:** solo feedback (entrada de drawer, popover y toast), con `prefers-reduced-motion` respetado.
 
 ## Qué se migra
@@ -55,10 +55,10 @@ Usan los componentes nuevos: `selector-rol`, `form-paciente`, `resumen-turno`, f
 
 ## Verificación
 
-`tsc`, `next build` y `vitest` en verde (con un test del mapa de estados). Verificación visual en navegador, claro y oscuro, a 1280 px y a 375 px: `/sistema`, `/`, `/reservar/*`, `/mis-datos`, `/panel/agenda`. Contraste AA de los pares de tokens, foco visible y operación solo con teclado de popover, drawer y diálogo.
+`tsc`, `next build` y `vitest` en verde (con un test del mapa de estados). Verificación visual en navegador, claro y oscuro, a 1280 px y a 375 px: `/system`, `/`, `/reservar/*`, `/mis-datos`, `/panel/agenda`. Contraste AA de los pares de tokens, foco visible y operación solo con teclado de popover, drawer y diálogo.
 
 ## Cambios de docs
 
-- Nuevo `docs/06-sistema-de-diseno.md`: anatomía de un componente, cuándo crear uno nuevo, tokens, estados, accesibilidad, claro/oscuro, celular vs desktop, copy.
-- `CLAUDE.md`: stack (Tailwind + shadcn), puntero al doc 06 y a `/sistema`, y la regla de que para cambiar el sistema se edita `globals.css` y la sección de diseño en el mismo cambio.
+- Nuevo `docs/06-design-system.md`: anatomía de un componente, cuándo crear uno nuevo, tokens, estados, accesibilidad, claro/oscuro, celular vs desktop, copy.
+- `CLAUDE.md`: stack (Tailwind + shadcn), puntero al doc 06 y a `/system`, y la regla de que para cambiar el sistema se edita `globals.css` y la sección de diseño en el mismo cambio.
 - `workspace/` no se edita desde el código: se avisa que la card queda hecha.
