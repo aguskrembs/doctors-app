@@ -84,4 +84,4 @@ El mapa completo de rutas y quién ve qué está en [docs/05-flujos-y-pantallas.
 | 2 · Cobertura y confianza | Reseñas, turnos por prepaga, seguimiento de reintegros | Sin empezar |
 | 3 · Plataforma clínica | Receta electrónica, historia clínica, estudios, instituciones | Sin empezar |
 
-Lo que falta para cerrar la Fase 0 sigue el orden de [docs/05](../docs/05-flujos-y-pantallas.md#orden-sugerido-para-codear-cortes-verticales).
+Lo que falta para cerrar la Fase 0, en épicas y cards, está en [plan-de-trabajo.md](plan-de-trabajo.md).

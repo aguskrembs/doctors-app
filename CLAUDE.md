@@ -16,6 +16,7 @@ Antes de cualquier desarrollo nuevo, leé `workspace/`. Es la referencia de prod
 | `workspace/lineamientos.md` | Principios de producto, experiencia, ingeniería y datos. Si una tarea los contradice, frená y preguntá |
 | `workspace/estructura.md` | Organización del repo, del código y de la documentación; estado por fase |
 | `workspace/backend-y-datos.md` | Diseño propuesto del backend y la base: módulos y sus tablas, invariantes, máquina de estados, flujos críticos. Su tabla "Del prototipo a producción" lista lo que el código todavía tiene que cerrar |
+| `workspace/plan-de-trabajo.md` | Épicas y cards en orden de prioridad, con responsable (Agus K frontend, Agus L backend). Antes de empezar una tarea, ubicá su card y respetá sus dependencias |
 | `workspace/decisiones/` | Decisiones de producto tomadas y por qué. No reabras una decisión registrada sin preguntar |
 | `workspace/exploraciones/` | Ideas en análisis. **No son specs:** no se implementan hasta que haya una decisión |
 

@@ -11,6 +11,7 @@ Acá vive el pensamiento de producto: los lineamientos que no cambian seguido, e
 | [lineamientos.md](lineamientos.md) | Principios generales de producto, experiencia, ingeniería, datos y forma de trabajo. Es lo primero que se lee |
 | [estructura.md](estructura.md) | Cómo está organizado el repo, el código y la documentación, y en qué fase está cada cosa |
 | [backend-y-datos.md](backend-y-datos.md) | Diseño propuesto del backend y la base de datos: módulos, modelo, invariantes, flujos críticos y qué le falta al prototipo |
+| [plan-de-trabajo.md](plan-de-trabajo.md) | Épicas y cards priorizadas para el desarrollo, repartidas entre Agus K (frontend) y Agus L (backend) |
 | [exploraciones/](exploraciones/) | Ideas de producto en análisis, que todavía no son una decisión |
 | [decisiones/](decisiones/) | Registro de decisiones de producto tomadas, con su porqué |
 
